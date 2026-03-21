@@ -93,7 +93,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vercel-build-output
-          path: dist
+          path: .vercel/output
       - name: deploye to vercel
         id: deploye
         run: |
