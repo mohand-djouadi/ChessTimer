@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: install depencies
+      - name: install dependencies
         run: pnpm install
       - name: run tests
         run: pnpm run test
@@ -43,3 +43,56 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest
+  VercelBuild:
+    needs: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v6
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: steup nodejs environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: install vercel cli
+        run: pnpm install -g vercel
+      - name: install dependencies
+        run: pnpm install
+      - name: build vercel
+        run: vercel build --token ${{ secrets.VERCEL_TOKEN }}
+      - name: upload vercel build
+        uses: actions/upload-artifact@v4
+        with:
+          name: vercel-build-output
+          path: dist
+  VercelDeploye:
+    needs: VercelBuild
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v6
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: steup nodejs environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: install vercel cli
+        run: pnpm install -g vercel
+      - name: download build output
+        uses: actions/download-artifact@v4
+        with:
+          name: vercel-build-output
+          path: dist
+      - name: deploye to vercel
+        id: deploye
+        run: |
+          URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "deployment_url=$URL" >> $GITHUB_OUTPUT
+      - name: get deployment url
+        run: echo "deployment url => ${{ steps.deploye.outputs.deployment_url }}"
