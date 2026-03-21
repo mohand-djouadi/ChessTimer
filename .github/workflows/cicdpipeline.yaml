@@ -25,3 +25,20 @@ jobs:
         run: pnpm install
       - name: run tests
         run: pnpm run test
+  DockerBuild:
+    needs: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v6
+      - name: build and push docker image
+        id: buildAndPushImage
+        uses: abhishek-070/docker-image-build-push-action@v1.0
+        with:
+          registry_url: ${{ secrets.DOCKERHUB_URL }}
+          repository_name: ${{ secrets.DOCKERHUB_REPO }}
+          user_name: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          docker_file: "."
+      - name: get image url
+        run: echo "image_url : ${{ steps.buildAndPushImage.outputs.image_pull_url }}"
