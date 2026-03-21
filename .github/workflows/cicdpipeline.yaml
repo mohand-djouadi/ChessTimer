@@ -41,4 +41,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
           docker_file: "."
       - name: get image url
-        run: echo "image_url : ${{ steps.buildAndPushImage.outputs.image_pull_url }}"
+        run: echo "image_url ${{ steps.buildAndPushImage.outputs.image_pull_url }}"
