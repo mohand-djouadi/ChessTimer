@@ -97,7 +97,7 @@ jobs:
       - name: deploye to vercel
         id: deploye
         run: |
-          URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --yes)
           echo "deployment_url=$URL" >> $GITHUB_OUTPUT
       - name: get deployment url
         run: echo "deployment url => ${{ steps.deploye.outputs.deployment_url }}"
